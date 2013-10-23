@@ -13,36 +13,37 @@ namespace ExifLib
     /// </summary>
     public sealed class ExifReader : IDisposable
     {
-        private readonly Stream _stream;
-        private readonly BinaryReader _reader;
         private static readonly Regex _nullDateTimeMatcher = new Regex(@"^[\s0]{4}[:\s][\s0]{2}[:\s][\s0]{5}[:\s][\s0]{2}[:\s][\s0]{2}$");
+
+        private readonly Stream _stream;
+        private readonly BinaryReader _reader;        
 
         /// <summary>
         /// The main tag id/absolute file offset catalogue
         /// </summary>
-        private Dictionary<ushort, long> ifd0Catalogue;
+        private Dictionary<ushort, long> _ifd0Catalogue;
 
         /// <summary>
         /// The thumbnail tag id/absolute file offset catalogue
         /// </summary>
         /// <remarks>JPEG images contain 2 main sections - one for the main image (which contains most of the useful EXIF data), and one for the thumbnail
         /// image (which contains little more than the thumbnail itself). This catalogue is only used by <see cref="GetJpegThumbnailBytes"/>.</remarks>
-        private Dictionary<ushort, long> ifd1Catalogue;
+        private Dictionary<ushort, long> _ifd1Catalogue;
 
         /// <summary>
         /// Indicates whether to read data using big or little endian byte aligns
         /// </summary>
-        private bool isLittleEndian;
+        private bool _isLittleEndian;
 
         /// <summary>
         /// The position in the filestream at which the TIFF header starts
         /// </summary>
-        private long tiffHeaderStart;
+        private long _tiffHeaderStart;
 
         /// <summary>
         /// The location of the thumbnail IFD
         /// </summary>
-        private uint ifd1Offset;
+        private uint _ifd1Offset;
 
         public ExifReader(string fileName) : this(new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
         {
@@ -59,7 +60,7 @@ namespace ExifLib
             // JPEG encoding uses big endian (i.e. Motorola) byte aligns. The TIFF encoding
             // found later in the document will specify the byte aligns used for the
             // rest of the document.
-            isLittleEndian = false;
+            _isLittleEndian = false;
 
             try
             {
@@ -162,7 +163,7 @@ namespace ExifLib
             long originalOffset = _stream.Position;
 
             // Move to the TIFF offset and retrieve the data
-            _stream.Seek(tiffOffset + tiffHeaderStart, SeekOrigin.Begin);
+            _stream.Seek(tiffOffset + _tiffHeaderStart, SeekOrigin.Begin);
 
             byte[] data = _reader.ReadBytes(byteCount);
 
@@ -182,7 +183,7 @@ namespace ExifLib
         /// <returns></returns>
         private ushort ToUShort(byte[] data)
         {
-            if (isLittleEndian != BitConverter.IsLittleEndian)
+            if (_isLittleEndian != BitConverter.IsLittleEndian)
                 Array.Reverse(data);
 
             return BitConverter.ToUInt16(data, 0);
@@ -256,7 +257,7 @@ namespace ExifLib
         /// </summary>
         private uint ToUint(byte[] data)
         {
-            if (isLittleEndian != BitConverter.IsLittleEndian)
+            if (_isLittleEndian != BitConverter.IsLittleEndian)
                 Array.Reverse(data);
 
             return BitConverter.ToUInt32(data, 0);
@@ -267,7 +268,7 @@ namespace ExifLib
         /// </summary>
         private int ToInt(byte[] data)
         {
-            if (isLittleEndian != BitConverter.IsLittleEndian)
+            if (_isLittleEndian != BitConverter.IsLittleEndian)
                 Array.Reverse(data);
 
             return BitConverter.ToInt32(data, 0);
@@ -275,7 +276,7 @@ namespace ExifLib
 
         private double ToDouble(byte[] data)
         {
-            if (isLittleEndian != BitConverter.IsLittleEndian)
+            if (_isLittleEndian != BitConverter.IsLittleEndian)
                 Array.Reverse(data);
 
             return BitConverter.ToDouble(data, 0);
@@ -283,7 +284,7 @@ namespace ExifLib
 
         private float ToSingle(byte[] data)
         {
-            if (isLittleEndian != BitConverter.IsLittleEndian)
+            if (_isLittleEndian != BitConverter.IsLittleEndian)
                 Array.Reverse(data);
 
             return BitConverter.ToSingle(data, 0);
@@ -291,7 +292,7 @@ namespace ExifLib
 
         private short ToShort(byte[] data)
         {
-            if (isLittleEndian != BitConverter.IsLittleEndian)
+            if (_isLittleEndian != BitConverter.IsLittleEndian)
                 Array.Reverse(data);
 
             return BitConverter.ToInt16(data, 0);
@@ -336,7 +337,7 @@ namespace ExifLib
         /// <param name="data"></param>
         /// <returns></returns>
         /// <remarks>Although this could be defined as covariant, it wouldn't work on Windows Phone</remarks>
-        private delegate T ConverterMethod<T>(byte[] data);
+        private delegate T ConverterMethod<out T>(byte[] data);
 
         #endregion
 
@@ -386,10 +387,10 @@ namespace ExifLib
                 throw new ExifLibException("Malformed Exif data");
 
             // We're now into the TIFF format
-            tiffHeaderStart = _stream.Position;
+            _tiffHeaderStart = _stream.Position;
 
             // What byte align will be used for the TIFF part of the document? II for Intel, MM for Motorola
-            isLittleEndian = ReadString(2) == "II";
+            _isLittleEndian = ReadString(2) == "II";
 
             // Next 2 bytes are always the same.
             if (ReadUShort() != 0x002A)
@@ -399,44 +400,44 @@ namespace ExifLib
             uint ifdOffset = ReadUint();
 
             // Note that this offset is from the first byte of the TIFF header. Jump to the IFD.
-            _stream.Position = ifdOffset + tiffHeaderStart;
+            _stream.Position = ifdOffset + _tiffHeaderStart;
 
             // Catalogue this first IFD (there will be another IFD)
-            ifd0Catalogue = new Dictionary<ushort, long>();
-            CatalogueIFD(ref ifd0Catalogue);
+            _ifd0Catalogue = new Dictionary<ushort, long>();
+            CatalogueIFD(ref _ifd0Catalogue);
 
             // The address to the IFD1 (the thumbnail IFD) is located immediately after the main IFD
-            ifd1Offset = ReadUint();
+            _ifd1Offset = ReadUint();
 
             // There's more data stored in the subifd, the offset to which is found in tag 0x8769.
             // As with all TIFF offsets, it will be relative to the first byte of the TIFF header.
             uint offset;
-            if (!GetTagValue(ifd0Catalogue, 0x8769, out offset))
+            if (!GetTagValue(_ifd0Catalogue, 0x8769, out offset))
                 throw new ExifLibException("Unable to locate Exif data");
 
             // Jump to the exif SubIFD
-            _stream.Position = offset + tiffHeaderStart;
+            _stream.Position = offset + _tiffHeaderStart;
 
             // Add the subIFD to the catalogue too
-            CatalogueIFD(ref ifd0Catalogue);
+            CatalogueIFD(ref _ifd0Catalogue);
 
             // Go to the GPS IFD and catalogue that too. It's an optional
             // section.
-            if (GetTagValue(ifd0Catalogue, 0x8825, out offset))
+            if (GetTagValue(_ifd0Catalogue, 0x8825, out offset))
             {
                 // Jump to the GPS SubIFD
-                _stream.Position = offset + tiffHeaderStart;
+                _stream.Position = offset + _tiffHeaderStart;
 
                 // Add the subIFD to the catalogue too
-                CatalogueIFD(ref ifd0Catalogue);
+                CatalogueIFD(ref _ifd0Catalogue);
             }
 
             // Finally, catalogue the thumbnail IFD if it's present
-            if (ifd1Offset != 0)
+            if (_ifd1Offset != 0)
             {
-                _stream.Position = ifd1Offset + tiffHeaderStart;
-                ifd1Catalogue = new Dictionary<ushort, long>();
-                CatalogueIFD(ref ifd1Catalogue);
+                _stream.Position = _ifd1Offset + _tiffHeaderStart;
+                _ifd1Catalogue = new Dictionary<ushort, long>();
+                CatalogueIFD(ref _ifd1Catalogue);
             }
         }
         #endregion
@@ -448,20 +449,20 @@ namespace ExifLib
             return GetTagValue((ushort) tag, out result);
         }
 
-        public bool GetTagValue<T>(ushort tagID, out T result)
+        public bool GetTagValue<T>(ushort tagId, out T result)
         {
             // All useful EXIF tags are stored in the ifd0 catalogue. The ifd1 catalogue is only for thumbnail retrieval.
-            return GetTagValue(ifd0Catalogue, tagID, out result);
+            return GetTagValue(_ifd0Catalogue, tagId, out result);
         }
 
         /// <summary>
         /// Retrieves an Exif value with the requested tag ID
         /// </summary>
-        private bool GetTagValue<T>(Dictionary<ushort, long> tagDictionary, ushort tagID, out T result)
+        private bool GetTagValue<T>(Dictionary<ushort, long> tagDictionary, ushort tagId, out T result)
         {
             ushort tiffDataType;
             uint numberOfComponents;
-            byte[] tagData = GetTagBytes(tagDictionary, tagID, out tiffDataType, out numberOfComponents);
+            byte[] tagData = GetTagBytes(tagDictionary, tagId, out tiffDataType, out numberOfComponents);
 
             if (tagData == null)
             {
@@ -624,26 +625,26 @@ namespace ExifLib
         /// <param name="numberOfComponents">The number of items which make up the data item - i.e. for a string, this will be the
         /// number of characters in the string</param>
         /// <param name="tagDictionary"></param>
-        /// <param name="tagID"></param>
-        private byte[] GetTagBytes(Dictionary<ushort, long> tagDictionary, ushort tagID, out ushort tiffDataType, out uint numberOfComponents)
+        /// <param name="tagId"></param>
+        private byte[] GetTagBytes(IDictionary<ushort, long> tagDictionary, ushort tagId, out ushort tiffDataType, out uint numberOfComponents)
         {
             // Get the tag's offset from the catalogue and do some basic error checks
-            if (_stream == null || _reader == null || tagDictionary == null || !tagDictionary.ContainsKey(tagID))
+            if (_stream == null || _reader == null || tagDictionary == null || !tagDictionary.ContainsKey(tagId))
             {
                 tiffDataType = 0;
                 numberOfComponents = 0;
                 return null;
             }
 
-            long tagOffset = tagDictionary[tagID];
+            long tagOffset = tagDictionary[tagId];
 
             // Jump to the TIFF offset
             _stream.Position = tagOffset;
 
             // Read the tag number from the file
-            ushort currentTagID = ReadUShort();
+            ushort currenttagId = ReadUShort();
 
-            if (currentTagID != tagID)
+            if (currenttagId != tagId)
                 throw new ExifLibException("Tag number not at expected offset");
 
             // Read the offset to the Exif IFD
@@ -703,12 +704,12 @@ namespace ExifLib
         /// <returns></returns>
         public byte[] GetJpegThumbnailBytes()
         {
-            if (ifd1Catalogue == null)
+            if (_ifd1Catalogue == null)
                 return null;
 
             // Get the thumbnail encoding
             ushort compression;
-            if (!GetTagValue(ifd1Catalogue, (ushort) ExifTags.Compression, out compression))
+            if (!GetTagValue(_ifd1Catalogue, (ushort) ExifTags.Compression, out compression))
                 return null;
 
             // This method only handles JPEG thumbnails (compression type 6)
@@ -717,12 +718,12 @@ namespace ExifLib
 
             // Get the location of the thumbnail
             uint offset;
-            if (!GetTagValue(ifd1Catalogue, (ushort) ExifTags.JPEGInterchangeFormat, out offset))
+            if (!GetTagValue(_ifd1Catalogue, (ushort) ExifTags.JPEGInterchangeFormat, out offset))
                 return null;
 
             // Get the length of the thumbnail data
             uint length;
-            if (!GetTagValue(ifd1Catalogue, (ushort) ExifTags.JPEGInterchangeFormatLength, out length))
+            if (!GetTagValue(_ifd1Catalogue, (ushort) ExifTags.JPEGInterchangeFormatLength, out length))
                 return null;
 
             _stream.Position = offset;

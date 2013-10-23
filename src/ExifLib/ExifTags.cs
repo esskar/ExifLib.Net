@@ -1,6 +1,4 @@
-﻿        using System.Diagnostics.CodeAnalysis;
-
-namespace ExifLib
+﻿namespace ExifLib
 {
     /// <summary>
     /// All exif tags as per the Exif standard 2.2, JEITA CP-2451
