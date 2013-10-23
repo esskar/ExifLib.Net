@@ -1,7 +1,7 @@
 ExifLib.Net
 ===========
 
-A Fast Exif Data Extractor for .NET 2.0+
+A Fast Exif Data Extractor for .NET 4.5+
 
 Preamble
 --------
