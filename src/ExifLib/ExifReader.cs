@@ -11,7 +11,7 @@ namespace ExifLib
     /// A class for reading Exif data from a JPEG file. The file will be open for reading for as long as the class exists.
     /// <seealso cref="http://gvsoft.homedns.org/exif/Exif-explanation.html"/>
     /// </summary>
-    public sealed class ExifReader : IDisposable
+    public class ExifReader : IDisposable
     {
         private static readonly Regex _nullDateTimeMatcher = new Regex(@"^[\s0]{4}[:\s][\s0]{2}[:\s][\s0]{5}[:\s][\s0]{2}[:\s][\s0]{2}$");
 
@@ -763,13 +763,28 @@ namespace ExifLib
 
         #region IDisposable Members
 
+        ~ExifReader()
+        {
+            Dispose(false);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                    // Make sure the file handle is released
+                    if (_reader != null)
+                        _reader.Close();
+                    if (_stream != null)
+                        _stream.Close();
+            }
+            _reader = null;
+            _stream = null;
+        }
         public void Dispose()
         {
-            // Make sure the file handle is released
-            if (_reader != null)
-                _reader.Close();
-            if (_stream != null)
-                _stream.Close();
+            Dispose(true);
+            GC.SuppressFinalize(this);      
         }
 
         #endregion
