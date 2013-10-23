@@ -75,7 +75,7 @@ namespace ExifLib
 
             // Open the file in a stream
             _stream = stream;
-            _reader = new BinaryReader(_stream);
+            _reader = new BinaryReader(_stream, Encoding.UTF8, leaveOpen);
 
             // Make sure the file's a JPEG.
             if (ReadUShort() != 0xFFD8)
@@ -773,13 +773,14 @@ namespace ExifLib
         {
             if (disposing)
             {
+                if (_reader != null)
+                    _reader.Dispose();
+
                 if (!_leaveOpen)
                 {
-                    // Make sure the file handle is released
-                    if (_reader != null)
-                        _reader.Close();
+                    // Make sure the file handle is released                
                     if (_stream != null)
-                        _stream.Close();
+                        _stream.Dispose();
                 }
             }
             _reader = null;
