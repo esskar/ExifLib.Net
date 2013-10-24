@@ -1,8 +1,10 @@
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExifLibTestApp", "ExifLibTestApp\ExifLibTestApp.csproj", "{286E1371-BFAA-4616-B796-600EE50964DA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExifLib", "ExifLib\ExifLib.csproj", "{C878A95F-E695-42FC-A714-E47DF6515679}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExifLibUnitTests", "ExifLibUnitTests\ExifLibUnitTests.csproj", "{363F99FD-B1B4-4D27-91AC-C312DFDCD493}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -18,6 +20,10 @@ Global
 		{C878A95F-E695-42FC-A714-E47DF6515679}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C878A95F-E695-42FC-A714-E47DF6515679}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C878A95F-E695-42FC-A714-E47DF6515679}.Release|Any CPU.Build.0 = Release|Any CPU
+		{363F99FD-B1B4-4D27-91AC-C312DFDCD493}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{363F99FD-B1B4-4D27-91AC-C312DFDCD493}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{363F99FD-B1B4-4D27-91AC-C312DFDCD493}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{363F99FD-B1B4-4D27-91AC-C312DFDCD493}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

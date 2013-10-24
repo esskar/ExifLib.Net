@@ -46,16 +46,13 @@ namespace ExifLib
         /// </summary>
         private uint _ifd1Offset;
 
+        private bool _isInitialized;
+
         public ExifReader(string fileName)
-            : this(new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-        {
-        }
+            : this(new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)) { }
 
         public ExifReader(Stream stream)
-            : this(stream, false)
-        {
-            
-        }
+            : this(stream, false) { }
 
         public ExifReader(Stream stream, bool leaveOpen)
         {
@@ -67,15 +64,21 @@ namespace ExifLib
 
             // Leave the stream open if the user wants it so
             _leaveOpen = leaveOpen;
+            _stream = stream;
+        }
+
+        private void Initialize()
+        {
+            if (_isInitialized)
+                return;
 
             // JPEG encoding uses big endian (i.e. Motorola) byte aligns. The TIFF encoding
             // found later in the document will specify the byte aligns used for the
             // rest of the document.
-            _isLittleEndian = false;            
+            _isLittleEndian = false;
 
-            // Open the file in a stream
-            _stream = stream;
-            _reader = new BinaryReader(_stream, Encoding.UTF8, leaveOpen);
+            // Open the file in a stream            
+            _reader = new BinaryReader(_stream, Encoding.UTF8, _leaveOpen);
 
             // Make sure the file's a JPEG.
             if (ReadUShort() != 0xFFD8)
@@ -86,6 +89,8 @@ namespace ExifLib
 
             // Create an index of all Exif tags found within the document
             CreateTagIndex();
+
+            _isInitialized = true;
         }
 
         #region TIFF methods
@@ -398,7 +403,7 @@ namespace ExifLib
                 throw new ExifLibException("Error in TIFF data");
 
             // Get the offset to the IFD (image file directory)
-            uint ifdOffset = ReadUint();
+            var ifdOffset = ReadUint();
 
             // Note that this offset is from the first byte of the TIFF header. Jump to the IFD.
             _stream.Position = ifdOffset + _tiffHeaderStart;
@@ -446,13 +451,13 @@ namespace ExifLib
         #region Exif data catalog and retrieval methods
 
         public bool GetTagValue<T>(ExifTags tag, out T result)
-        {
+        {            
             return GetTagValue((ushort)tag, out result);
         }
 
         public bool GetTagValue<T>(ushort tagId, out T result)
         {
-            // All useful EXIF tags are stored in the ifd0 catalogue. The ifd1 catalogue is only for thumbnail retrieval.
+            // All useful EXIF tags are stored in the ifd0 catalogue. The ifd1 catalogue is only for thumbnail retrieval.            
             return GetTagValue(_ifd0Catalogue, tagId, out result);
         }
 
@@ -461,6 +466,8 @@ namespace ExifLib
         /// </summary>
         private bool GetTagValue<T>(IDictionary<ushort, long> tagDictionary, ushort tagId, out T result)
         {
+            Initialize();
+
             ushort tiffDataType;
             uint numberOfComponents;
             var tagData = GetTagBytes(tagDictionary, tagId, out tiffDataType, out numberOfComponents);
@@ -471,7 +478,7 @@ namespace ExifLib
                 return false;
             }
 
-            byte fieldLength = GetTIFFFieldLength(tiffDataType);
+            var fieldLength = GetTIFFFieldLength(tiffDataType);
 
             // Convert the data to the appropriate datatype. Note the weird boxing via object.
             // The compiler doesn't like it otherwise.
@@ -705,6 +712,8 @@ namespace ExifLib
         /// <returns></returns>
         public byte[] GetJpegThumbnailBytes()
         {
+            Initialize();
+
             if (_ifd1Catalogue == null)
                 return null;
 

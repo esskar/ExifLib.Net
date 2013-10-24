@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>95ad7b8d-e46a-435d-a3b9-f9f28e2842ed</ProjectGuid>
+    <ProjectGuid>{363F99FD-B1B4-4D27-91AC-C312DFDCD493}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>ExifLibUnitTests</RootNamespace>
@@ -36,6 +36,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Drawing" />
   </ItemGroup>
   <Choose>
     <When Condition="('$(VisualStudioVersion)' == '10.0' or '$(VisualStudioVersion)' == '') and '$(TargetFrameworkVersion)' == 'v3.5'">
@@ -50,8 +51,29 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="UnitTest1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ExifReaderTests.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ExifLib\ExifLib.csproj">
+      <Project>{C878A95F-E695-42FC-A714-E47DF6515679}</Project>
+      <Name>ExifLib</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Data\Images\canon-ixus.jpg" />
+    <EmbeddedResource Include="Data\Images\fujifilm-dx10.jpg" />
+    <EmbeddedResource Include="Data\Images\fujifilm-finepix40i.jpg" />
+    <EmbeddedResource Include="Data\Images\fujifilm-mx1700.jpg" />
+    <EmbeddedResource Include="Data\Images\kodak-dc210.jpg" />
+    <EmbeddedResource Include="Data\Images\kodak-dc240.jpg" />
+    <EmbeddedResource Include="Data\Images\nikon-e950.jpg" />
+    <EmbeddedResource Include="Data\Images\olympus-c960.jpg" />
+    <EmbeddedResource Include="Data\Images\ricoh-rdc5300.jpg" />
+    <EmbeddedResource Include="Data\Images\sanyo-vpcg250.jpg" />
+    <EmbeddedResource Include="Data\Images\sanyo-vpcsx550.jpg" />
+    <EmbeddedResource Include="Data\Images\sony-cybershot.jpg" />
+    <EmbeddedResource Include="Data\Images\sony-d700.jpg" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
