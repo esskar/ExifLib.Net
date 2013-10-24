@@ -72,6 +72,8 @@ namespace ExifLib
             if (_isInitialized)
                 return;
 
+            _isInitialized = true;
+
             // JPEG encoding uses big endian (i.e. Motorola) byte aligns. The TIFF encoding
             // found later in the document will specify the byte aligns used for the
             // rest of the document.
@@ -88,9 +90,7 @@ namespace ExifLib
             ReadToExifStart();
 
             // Create an index of all Exif tags found within the document
-            CreateTagIndex();
-
-            _isInitialized = true;
+            CreateTagIndex();            
         }
 
         #region TIFF methods
@@ -458,6 +458,7 @@ namespace ExifLib
         public bool GetTagValue<T>(ushort tagId, out T result)
         {
             // All useful EXIF tags are stored in the ifd0 catalogue. The ifd1 catalogue is only for thumbnail retrieval.            
+            Initialize();
             return GetTagValue(_ifd0Catalogue, tagId, out result);
         }
 
@@ -465,9 +466,7 @@ namespace ExifLib
         /// Retrieves an Exif value with the requested tag ID
         /// </summary>
         private bool GetTagValue<T>(IDictionary<ushort, long> tagDictionary, ushort tagId, out T result)
-        {
-            Initialize();
-
+        {            
             ushort tiffDataType;
             uint numberOfComponents;
             var tagData = GetTagBytes(tagDictionary, tagId, out tiffDataType, out numberOfComponents);

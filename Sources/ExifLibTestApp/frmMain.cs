@@ -70,9 +70,9 @@ namespace ExifLibTestApp
             // lblFile
             // 
             this.lblFile.AutoSize = true;
-            this.lblFile.Location = new System.Drawing.Point(12, 9);
+            this.lblFile.Location = new System.Drawing.Point(14, 10);
             this.lblFile.Name = "lblFile";
-            this.lblFile.Size = new System.Drawing.Size(26, 13);
+            this.lblFile.Size = new System.Drawing.Size(34, 17);
             this.lblFile.TabIndex = 0;
             this.lblFile.Text = "File:";
             // 
@@ -80,16 +80,16 @@ namespace ExifLibTestApp
             // 
             this.txtFileName.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
             this.txtFileName.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.FileSystem;
-            this.txtFileName.Location = new System.Drawing.Point(44, 6);
+            this.txtFileName.Location = new System.Drawing.Point(53, 7);
             this.txtFileName.Name = "txtFileName";
-            this.txtFileName.Size = new System.Drawing.Size(192, 20);
+            this.txtFileName.Size = new System.Drawing.Size(230, 22);
             this.txtFileName.TabIndex = 1;
             // 
             // btnBrowse
             // 
-            this.btnBrowse.Location = new System.Drawing.Point(242, 4);
+            this.btnBrowse.Location = new System.Drawing.Point(290, 5);
             this.btnBrowse.Name = "btnBrowse";
-            this.btnBrowse.Size = new System.Drawing.Size(75, 23);
+            this.btnBrowse.Size = new System.Drawing.Size(90, 26);
             this.btnBrowse.TabIndex = 2;
             this.btnBrowse.Text = "Browse";
             this.btnBrowse.UseVisualStyleBackColor = true;
@@ -97,9 +97,9 @@ namespace ExifLibTestApp
             // 
             // btnPopulate
             // 
-            this.btnPopulate.Location = new System.Drawing.Point(323, 4);
+            this.btnPopulate.Location = new System.Drawing.Point(388, 5);
             this.btnPopulate.Name = "btnPopulate";
-            this.btnPopulate.Size = new System.Drawing.Size(75, 23);
+            this.btnPopulate.Size = new System.Drawing.Size(90, 26);
             this.btnPopulate.TabIndex = 2;
             this.btnPopulate.Text = "Get data";
             this.btnPopulate.UseVisualStyleBackColor = true;
@@ -110,18 +110,18 @@ namespace ExifLibTestApp
             this.txtFields.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtFields.Location = new System.Drawing.Point(13, 36);
+            this.txtFields.Location = new System.Drawing.Point(16, 42);
             this.txtFields.Multiline = true;
             this.txtFields.Name = "txtFields";
             this.txtFields.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.txtFields.Size = new System.Drawing.Size(465, 206);
+            this.txtFields.Size = new System.Drawing.Size(460, 185);
             this.txtFields.TabIndex = 3;
             // 
             // btnSpeedTest
             // 
-            this.btnSpeedTest.Location = new System.Drawing.Point(404, 4);
+            this.btnSpeedTest.Location = new System.Drawing.Point(485, 5);
             this.btnSpeedTest.Name = "btnSpeedTest";
-            this.btnSpeedTest.Size = new System.Drawing.Size(75, 23);
+            this.btnSpeedTest.Size = new System.Drawing.Size(90, 26);
             this.btnSpeedTest.TabIndex = 2;
             this.btnSpeedTest.Text = "Speed test";
             this.btnSpeedTest.UseVisualStyleBackColor = true;
@@ -130,16 +130,16 @@ namespace ExifLibTestApp
             // pictureBoxThumbnail
             // 
             this.pictureBoxThumbnail.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.pictureBoxThumbnail.Location = new System.Drawing.Point(15, 248);
+            this.pictureBoxThumbnail.Location = new System.Drawing.Point(18, 234);
             this.pictureBoxThumbnail.Name = "pictureBoxThumbnail";
-            this.pictureBoxThumbnail.Size = new System.Drawing.Size(95, 77);
+            this.pictureBoxThumbnail.Size = new System.Drawing.Size(114, 89);
             this.pictureBoxThumbnail.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.pictureBoxThumbnail.TabIndex = 4;
             this.pictureBoxThumbnail.TabStop = false;
             // 
             // Form1
             // 
-            this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
+            this.AutoScaleBaseSize = new System.Drawing.Size(6, 15);
             this.ClientSize = new System.Drawing.Size(490, 337);
             this.Controls.Add(this.pictureBoxThumbnail);
             this.Controls.Add(this.txtFields);
